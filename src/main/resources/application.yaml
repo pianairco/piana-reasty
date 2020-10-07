@@ -1,0 +1,170 @@
+server:
+  port: 8088
+  servlet:
+    encoding:
+      force-response: true
+spring:
+  servlet:
+    multipart:
+      max-file-size: 2048KB
+      max-request-size: 2048KB
+  datasource:
+    url: jdbc:h2:file:./data/reasty
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+    h2:
+      console:
+        enabled: true
+    jpa:
+      database-platform: org.hibernate.dialect.H2Dialect
+  jpa:
+    hibernate:
+      naming:
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+app:
+  mode:
+    debug: true
+  service:
+    resources:
+      images:
+        sql:
+          type: select
+          query: select image_type, image_data from images where image_src = ?
+          resultType: object
+          params: 1=~
+          result: '#content-type=image_type,$body=image_data'
+      images2:
+        sql:
+          type: select
+          query: select image_type, image_data from images where image_src = ?
+          resultType: binary
+          params: 1=~
+          result: '#content-type=image_type,$body=image_data'
+    actions:
+      session:
+        detail:
+          - sql:
+              type: select
+              query: select detail from samples_session where id = ?
+              resultType: object
+              params: 1=*sessionId
+        updateSessionDetail:
+          - sql:
+              type: update
+              query: update samples_session set detail = ? where id = ?
+              resultType: object
+              params: 1=detail,2=sessionId
+              result: detail=detail
+        images:
+          - sql:
+              type: select
+              query: select id, image_src, orders from samples_session_image where samples_session_id = ?
+              resultType: list
+              params: 1=*sessionId
+        addSession1:
+          - function: addSession
+        addSession:
+          - sql:
+              type: insert
+              query: insert into samples_session (id, samples_id, title, description, icon_src, orders) values(?, ?, ?, ?, ?, ?)
+              resultType: object
+              params: 1=!id:vavishka_seq,2=sampleId,3=title,4=description,5=@imageSrc:icon.base64&icon.rotate&#group,6=orders
+              result: id=@id,title=title,description=description,iconSrc=@imageSrc
+        addSessionImage:
+          - sql:
+              type: insert
+              query: insert into samples_session_image (id, samples_session_id, image_src, orders) values(?, ?, ?, ?)
+              resultType: object
+              params: 1=!id:vavishka_seq,2=sessionId,3=@imageSrc:image&rotate&#group,4=orders
+              result: id=@id,imageSrc=@imageSrc,orders=orders
+        sessions:
+          - sql:
+              type: select
+              query: select id, title, description, icon_src, orders from samples_session where samples_id = ?
+              resultType: list
+              params: 1=sampleId
+      sample:
+        samples:
+          - sql:
+              type: select
+              query: select id, title, description, image_src from samples
+              resultType: list
+        sample:
+          - sql:
+              type: select
+              query: select id, title, description, image_src from samples where title=? and description like ?
+              resultType: object
+              params: 1=title,2=%description%
+        sampleById:
+          - sql:
+              type: select
+              query: select id, title, description, image_src from samples where id = ?
+              resultType: object
+              params: 1=id
+        addSample:
+          - sql:
+              type: insert
+              query: insert into samples (id, title, description, image_src) values(?, ?, ?, ?)
+              resultType: object
+              sequenceName: vavishka_seq
+              params: 1=!id:vavishka_seq,2=title,3=description,4=@imageSrc:image.base64&image.rotate&#group
+              result: id=@id,title=title,description=description,imageSrc=@imageSrc
+        deleteSample:
+          - sql:
+              type: delete
+              query: delete from samples_session_image s where s.id in (select id from samples_session where samples_id = ?)
+              resultType: object
+              params: 1=sampleId
+              result: id=sampleId
+          - sql:
+              type: delete
+              query: delete from samples_session where samples_id = ?
+              resultType: object
+              params: 1=sampleId
+              result: id=sampleId
+          - sql:
+              type: delete
+              query: delete from samples where id = ?
+              resultType: object
+              params: 1=sampleId
+              result: id=sampleId
+      auth:
+        appInfo:
+          - function: appInfo
+storage:
+  location: c:/upload-dir
+  bean: afterSaveImage
+  groups:
+    sample:
+      folder: sample
+      width: 640
+      height: 640
+    insert-sample-session-image:
+      folder: sample-session
+      width: 512
+      height: 512
+      afterSaveImageActivity: insertSampleSessionImageBusiness
+    replace-sample-session-image:
+      folder: sample-session
+      width: 512
+      height: 512
+      afterSaveImageActivity: replaceSampleSessionImageBusiness
+    delete-sample-session-image:
+      folder: sample-session
+      width: 512
+      height: 512
+      afterSaveImageActivity: deleteSampleSessionImageBusiness
+    session:
+      folder: sample-session
+      width: 512
+      height: 512
+      sql: update samples_session set $image_src$ = ? where id = ?
+      sqls:
+        - delete samples_session_image where samples_session_id = $sampleSessionId$ and orders = $orders$
+        - insert into samples_session_image (id, samples_session_id, image_src, orders) values($id$, $sampleSessionId$, $imageSrc$, $orders$)
+    header:
+      folder: header
+      width: 640
+      height: 640
+      sql: insert into header (path, orders) values (?, ?)

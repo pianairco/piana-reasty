@@ -1,0 +1,42 @@
+server:
+  port: 8088
+  servlet:
+    encoding:
+      force-response: true
+spring:
+  servlet:
+    multipart:
+      max-file-size: 2048KB
+      max-request-size: 2048KB
+  datasource:
+    url: jdbc:h2:mem:reasty
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+    h2:
+      console:
+        enabled: true
+    jpa:
+      database-platform: org.hibernate.dialect.H2Dialect
+  jpa:
+    hibernate:
+      naming:
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+app:
+  mode:
+    debug: true
+  service:
+    actions:
+      users:
+        select:
+          method: post
+          stages:
+            - sql:
+                result-name: res1
+                type: select
+                query: select first_name from users where id = ?
+                resultType: object
+                params: 1=*userId
+            - throws:
+                name: first
+                type: runtime
