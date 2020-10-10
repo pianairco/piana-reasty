@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -133,6 +134,7 @@ public class AjaxController {
     @RequestMapping(value = "/ajax/serve", method = RequestMethod.POST,
             consumes = "application/json; charset=utf8",
             produces = "application/json; charset=utf8")
+    @Transactional(value = Transactional.TxType.REQUIRES_NEW)
     public @ResponseBody
     ResponseEntity handleAjax(HttpServletRequest request,
                               @RequestBody Map<String, Object> body) {
