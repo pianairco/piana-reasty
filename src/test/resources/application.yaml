@@ -34,9 +34,13 @@ app:
             - sql:
                 result-name: res1
                 type: select
-                query: select first_name from users where id = ?
-                resultType: object
-                params: 1=*userId
+                query: select reasty_seq.nextval from dual
+                resultType: long
+            - sql:
+                result-name: res2
+                type: insert
+                query: insert into users_role (id, users_id, title, orders) values (?, ?, ?, ?)
+                params: 1=*userId,2=^res1:i,3=title,4=orders
             - throws:
                 name: first
                 type: runtime

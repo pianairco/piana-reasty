@@ -200,6 +200,15 @@ public class AjaxController {
                                 String imageSrc = storageService.store(base64, group, rotate);
                                 params[Integer.valueOf(split1[0]) - 1] = imageSrc;
                                 containerMap.put(index, imageSrc);
+                            } else if (split1[1].startsWith("^")) {// @  => multiple (* => parameter, # => header, $ => const)
+                                String[] substring = split1[1].substring(1).split(":");
+                                String index = substring[0];
+                                String type = substring[1];
+                                Object val = null;
+                                if(type.equalsIgnoreCase("i")) {
+                                    val = resultMap.get(index);
+                                }
+                                params[Integer.valueOf(split1[0]) - 1] = val;
                             } else {
                                 params[Integer.valueOf(split1[0]) - 1] = parameterParser.parse(split1[1], request, body);
                             }
@@ -211,7 +220,8 @@ public class AjaxController {
                     if (result instanceof AjaxReplaceType && result == AjaxReplaceType.NO_RESULT)
                         return notFound.apply(request);
                     else {
-                        if (stage.getSql() != null && methods.contains(stage.getSql().getType())) {
+//                        if (stage.getSql() != null && methods.contains(stage.getSql().getType())) {
+                        if (stage.getSql() != null && stage.getSql().getResultName() != null) {
                             if (stage.getSql().getResult() != null) {
                                 Map<String, Object> evaluateMap = new LinkedHashMap<>();
                                 String[] split = stage.getSql().getResult().split(",");
@@ -223,13 +233,13 @@ public class AjaxController {
                                         evaluateMap.put(split1[0], body.get(split1[1]));
                                     }
                                 }
-                                resultMap.put(stage.getResultName(), evaluateMap);
+                                resultMap.put(stage.getSql().getResultName(), evaluateMap);
 //                                return ResponseEntity.ok(resultMap);
                             } else {
                                 //ToDo: return id as { 'id': id }
                             }
                         }
-                        resultMap.put(stage.getResultName(), result);
+                        resultMap.put(stage.getSql().getResultName(), result);
                     }
                 }
             }

@@ -103,6 +103,7 @@ public class ServiceProperties {
         private String sequenceName;
         private String params;
         private String result;
+        private String resultName;
 
         public String getType() {
             return type;
@@ -150,6 +151,14 @@ public class ServiceProperties {
 
         public void setResult(String result) {
             this.result = result;
+        }
+
+        public String getResultName() {
+            return resultName;
+        }
+
+        public void setResultName(String resultName) {
+            this.resultName = resultName;
         }
     }
 

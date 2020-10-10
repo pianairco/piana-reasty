@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ir.piana.dev.pianareasty.sqlrest.AjaxController;
 import org.assertj.core.api.Assertions;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,12 +40,14 @@ class PianaReastyApplicationTests {
 	}
 
 	@Test
-	public void getUsersName() throws JsonProcessingException {
+	public void getUsersName() throws JsonProcessingException, JSONException {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.set("action", "users");
 		headers.set("activity", "select");
 		JSONObject object = new JSONObject();
+//		object.put("title", "simple");
+//		object.put("orders", 1);
 		HttpEntity<String> request =
 				new HttpEntity<String>(object.toString(), headers);
 		String s = this.restTemplate.postForObject(

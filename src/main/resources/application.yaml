@@ -42,6 +42,20 @@ app:
           params: 1=~
           result: '#content-type=image_type,$body=image_data'
     actions:
+      users:
+        select:
+          method: post
+          stages:
+            - sql:
+                result-name: res1
+                type: select
+                query: select vavishka_seq.nextval from dual
+                resultType: long
+            - sql:
+                result-name: res2
+                type: insert
+                query: insert into users_role (id, users_id, title, orders) values (?, ?, ?, ?)
+                params: 1=^res1:i,2=*userId,3=title,4=orders
       session:
         detail:
           - sql:

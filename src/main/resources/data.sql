@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS users_role;
 DROP TABLE IF EXISTS users;
 
 create sequence IF NOT EXISTS vavishka_seq;
@@ -62,4 +63,12 @@ CREATE TABLE IF NOT EXISTS images (
     image_src char(70),
     image_type char(10),
     image_data binary(100000)
+);
+
+CREATE TABLE users_role (
+    id bigint default vavishka_seq.nextval primary key,
+    users_id bigint,
+    title varchar(128),
+    orders int,
+    CONSTRAINT FK_USERS_ROLE_TO_USERS FOREIGN KEY ( users_id ) REFERENCES users( id )
 );
