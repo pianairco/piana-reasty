@@ -31,6 +31,7 @@ public class ServiceProperties {
 
     public static class Activity {
         private String method;
+        private String result;
         private List<ActivityStage> stages;
 
         public Activity() {
@@ -51,10 +52,18 @@ public class ServiceProperties {
         public void setStages(List<ActivityStage> stages) {
             this.stages = stages;
         }
+
+        public String getResult() {
+            return result;
+        }
+
+        public void setResult(String result) {
+            this.result = result;
+        }
     }
 
     public static class ActivityStage {
-        private String resultName;
+        private String name;
         @JsonProperty("throws")
         private Throws exception;
         private String function;
@@ -63,12 +72,12 @@ public class ServiceProperties {
         public ActivityStage() {
         }
 
-        public String getResultName() {
-            return resultName;
+        public String getName() {
+            return name;
         }
 
-        public void setResultName(String resultName) {
-            this.resultName = resultName;
+        public void setName(String name) {
+            this.name = name;
         }
 
         public String getFunction() {
@@ -103,7 +112,6 @@ public class ServiceProperties {
         private String sequenceName;
         private String params;
         private String result;
-        private String resultName;
 
         public String getType() {
             return type;
@@ -151,14 +159,6 @@ public class ServiceProperties {
 
         public void setResult(String result) {
             this.result = result;
-        }
-
-        public String getResultName() {
-            return resultName;
-        }
-
-        public void setResultName(String resultName) {
-            this.resultName = resultName;
         }
     }
 

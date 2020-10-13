@@ -30,17 +30,28 @@ app:
       users:
         select:
           method: post
+          result: res3
           stages:
-            - sql:
-                result-name: res1
+            - name: res1
+              sql:
                 type: select
                 query: select reasty_seq.nextval from dual
                 resultType: long
-            - sql:
-                result-name: res2
+            - name: res2
+              sql:
                 type: insert
                 query: insert into users_role (id, users_id, title, orders) values (?, ?, ?, ?)
-                params: 1=*userId,2=^res1:i,3=title,4=orders
-            - throws:
-                name: first
-                type: runtime
+                params: 1=^res1:i,2=*userId,3=title,4=orders
+            - name: res3
+              sql:
+                type: select
+                query: select age, amount from users where id = ?
+                params: 1=*userId
+                resultType: object
+                result: age=~age,price=~amount
+            - name: res4
+              sql:
+                 type: select
+                 query: select age, amount from users
+                 resultType: list
+                 result: age=~age,price=~amount

@@ -46,8 +46,8 @@ class PianaReastyApplicationTests {
 		headers.set("action", "users");
 		headers.set("activity", "select");
 		JSONObject object = new JSONObject();
-//		object.put("title", "simple");
-//		object.put("orders", 1);
+		object.put("title", "simple");
+		object.put("orders", 1);
 		HttpEntity<String> request =
 				new HttpEntity<String>(object.toString(), headers);
 		String s = this.restTemplate.postForObject(
@@ -55,6 +55,6 @@ class PianaReastyApplicationTests {
 
 		JsonNode root = objectMapper.readTree(s);
 
-		Assertions.assertThat(root.get("firstName").asText()).contains("amin");
+		Assertions.assertThat(root.get("age").asText()).contains("16");
 	}
 }

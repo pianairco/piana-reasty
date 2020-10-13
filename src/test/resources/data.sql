@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS users_role;
+
 DROP TABLE IF EXISTS users;
 
 create sequence IF NOT EXISTS reasty_seq;

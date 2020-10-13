@@ -223,10 +223,11 @@ public class AjaxController {
                         return notFound.apply(request);
                     else {
 //                        if (stage.getSql() != null && methods.contains(stage.getSql().getType())) {
-                        if (stage.getSql() != null && stage.getSql().getResultName() != null) {
-                            if (stage.getSql().getResult() != null) {
+
+                        if (stage.getSql() != null && stage.getSql().getResult() != null) {
+                            String[] split = stage.getSql().getResult().split(",");
+                            if (stage.getSql().getResultType() == null || stage.getSql().getResultType().isEmpty()) {
                                 Map<String, Object> evaluateMap = new LinkedHashMap<>();
-                                String[] split = stage.getSql().getResult().split(",");
                                 for (int i = 0; i < split.length; i++) {
                                     String[] split1 = split[i].split("=");
                                     if (split1[1].startsWith("@")) {
@@ -235,17 +236,50 @@ public class AjaxController {
                                         evaluateMap.put(split1[0], body.get(split1[1]));
                                     }
                                 }
-                                resultMap.put(stage.getSql().getResultName(), evaluateMap);
-//                                return ResponseEntity.ok(resultMap);
-                            } else {
-                                //ToDo: return id as { 'id': id }
+                                resultMap.put(stage.getName(), evaluateMap);
+                            } else if (stage.getSql().getResultType().equalsIgnoreCase("object")) {
+                                Map<String, Object> evaluateMap = new LinkedHashMap<>();
+                                for (int i = 0; i < split.length; i++) {
+                                    String[] split1 = split[i].split("=");
+                                    if (split1[1].startsWith("@")) {
+                                        evaluateMap.put(split1[0], containerMap.get(split1[1].substring(1)));
+                                    } else if (split1[1].startsWith("~")) {
+                                        evaluateMap.put(split1[0], ((Map)result).get(split1[1].substring(1)));
+                                    } else {
+                                        evaluateMap.put(split1[0], body.get(split1[1]));
+                                    }
+                                }
+                                resultMap.put(stage.getName(), evaluateMap);
+                            } else if (stage.getSql().getResultType().equalsIgnoreCase("list")) {
+                                List<Map> list = new ArrayList<>();
+                                for(Map<String, Object> res : ((List<Map>)result)) {
+                                    Map<String, Object> evaluateMap = new LinkedHashMap<>();
+                                    for (int i = 0; i < split.length; i++) {
+                                        String[] split1 = split[i].split("=");
+                                        if (split1[1].startsWith("@")) {
+                                            evaluateMap.put(split1[0], containerMap.get(split1[1].substring(1)));
+                                        } else if (split1[1].startsWith("~")) {
+                                            evaluateMap.put(split1[0], res.get(split1[1].substring(1)));
+                                        } else {
+                                            evaluateMap.put(split1[0], body.get(split1[1]));
+                                        }
+                                    }
+                                    list.add(evaluateMap);
+                                }
+                                resultMap.put(stage.getName(), list);
                             }
+                        } else {
+                            resultMap.put(stage.getName(), result);
                         }
-                        resultMap.put(stage.getSql().getResultName(), result);
                     }
                 }
             }
-            Object result = resultMap.get(activity.getStages().get(activity.getStages().size() - 1));
+            Object result = null;
+            if(activity.getResult() == null) {
+                result = null;
+            } else {
+                result = resultMap.get(activity.getResult());
+            }
             String s = null;
             try {
                 s = objectMapper.writeValueAsString(result);
