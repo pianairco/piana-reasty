@@ -11,6 +11,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
@@ -55,6 +57,14 @@ public class AjaxController {
     @Autowired
     @Qualifier("jdbcObjectMapper")
     private ObjectMapper objectMapper;
+
+    /*
+    https://www.baeldung.com/spring-programmatic-transaction-management
+    https://ducmanhphan.github.io/2020-04-15-How-to-implement-programmatic-transaction-management-in-spring-data-jpa/
+     */
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
 
     private static ObjectMapper jsonMapper = new ObjectMapper();
 
