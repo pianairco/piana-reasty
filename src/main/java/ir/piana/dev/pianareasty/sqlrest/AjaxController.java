@@ -12,12 +12,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -72,6 +72,7 @@ public class AjaxController {
 
     @PostConstruct
     public void init() {
+        System.out.println("init");
 //        List<String> dollorKeys = serviceProperties.resources.keySet().stream().collect(Collectors.toList());
 //        Collections.sort(dollorKeys, Comparator.comparingInt(String::length).reversed());
     }
@@ -144,7 +145,7 @@ public class AjaxController {
     @RequestMapping(value = "/ajax/serve", method = RequestMethod.POST,
             consumes = "application/json; charset=utf8",
             produces = "application/json; charset=utf8")
-    @Transactional(value = Transactional.TxType.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public @ResponseBody
     ResponseEntity handleAjax(HttpServletRequest request,
                               @RequestBody Map<String, Object> body) {
@@ -301,6 +302,8 @@ public class AjaxController {
             return notFound.apply(request);
         }
     }
+
+
 
     Function<HttpServletRequest, ResponseEntity> notFound = (r) -> {
         HttpHeaders responseHeaders = new HttpHeaders();

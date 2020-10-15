@@ -33,6 +33,8 @@ app:
           result: res3
           stages:
             - name: res1
+              trx:
+                propagation: REQUIRED
               sql:
                 type: select
                 query: select reasty_seq.nextval from dual

@@ -1,7 +1,10 @@
 package ir.piana.dev.pianareasty.sqlrest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -64,6 +67,7 @@ public class ServiceProperties {
 
     public static class ActivityStage {
         private String name;
+        private Trx trx;
         @JsonProperty("throws")
         private Throws exception;
         private String function;
@@ -102,6 +106,26 @@ public class ServiceProperties {
 
         public void setThrows(Throws exception) {
             this.exception = exception;
+        }
+
+        public Trx getTrx() {
+            return trx;
+        }
+
+        public void setTrx(Trx trx) {
+            this.trx = trx;
+        }
+    }
+
+    public static class Trx {
+        private Propagation propagation;
+
+        public Propagation getPropagation() {
+            return propagation;
+        }
+
+        public void setPropagation(Propagation propagation) {
+            this.propagation = propagation;
         }
     }
 
